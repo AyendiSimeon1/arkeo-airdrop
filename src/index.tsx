@@ -1,3 +1,8 @@
+import { WalletAdapterNetwork } from '@solana/wallet-adapter-base';
+import { ConnectionProvider, WalletProvider } from '@solana/wallet-adapter-react';
+import { WalletModalProvider } from '@solana/wallet-adapter-react-ui';
+import { PhantomWalletAdapter, TrustWalletAdapter } from '@solana/wallet-adapter-wallets';
+import '@solana/wallet-adapter-react-ui/styles.css';
 import React from 'react'
 import ReactDOM from 'react-dom/client'
 import App from './App.tsx'
@@ -13,7 +18,6 @@ import { wallets } from '@cosmos-kit/keplr-extension'
 import { Chain, AssetList } from '@chain-registry/types'
 import '@interchain-ui/react/globalStyles'
 import '@interchain-ui/react/styles'
-import { KeplrProvider } from './contexts/KeplrContext'
 
 const projectId = import.meta.env.VITE_WALLET_CONNECT_ID
 const arkeoEndpointRest = import.meta.env.VITE_ARKEO_ENDPOINT_REST
@@ -70,29 +74,13 @@ const localArkeoAssets: AssetList = {
 root.render(
   <ChakraProvider theme={theme}>
     <WagmiConfig config={wagmiConfig}>
-      <KeplrProvider>
-        <ChainProvider
-          chains={[...chains, localArkeo]}
-          assetLists={[...assets, localArkeoAssets]}
-          wallets={wallets}
-          throwErrors={false}
-          walletConnectOptions={{ signClient: { projectId: projectId } }}
-          endpointOptions={{
-            endpoints: {
-              arkeo: {
-                rpc: [arkeoEndpointRpc],
-                rest: [arkeoEndpointRest],
-              },
-              thorchain: {
-                rpc: [thorchainEndpointRpc],
-                rest: [thorchainEndpointRest],
-              },
-            },
-          }}
-        >
-          <App />
-        </ChainProvider>
-      </KeplrProvider>
+      <ConnectionProvider endpoint={'https://api.mainnet-beta.solana.com'}>
+        <WalletProvider wallets={[new PhantomWalletAdapter(), new TrustWalletAdapter()]} autoConnect>
+          <WalletModalProvider>
+            <App />
+          </WalletModalProvider>
+        </WalletProvider>
+      </ConnectionProvider>
     </WagmiConfig>
   </ChakraProvider>,
 )

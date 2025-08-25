@@ -76,7 +76,7 @@ export const Learn: React.FC<Props> = ({}) => {
                 transition={{ delay: 0.2 }}
                 style={nonSelectableText}
               >
-                Learn About Arkeo
+                Claim Free Airdrop
               </MotionText>
               <MotionText
                 fontSize="24px"

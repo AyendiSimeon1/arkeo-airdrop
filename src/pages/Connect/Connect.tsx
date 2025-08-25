@@ -7,7 +7,7 @@ import { MiddleEllipsis } from '@components/MiddleEllipsis'
 import { toDecimal } from '@utils/functions'
 
 import { Learn } from './components/Learn'
-import { Cosmos } from './components/Cosmos'
+import { SolanaEvmWallet } from './components/SolanaEvmWallet'
 import { Eth } from './components/Eth'
 import { Claim } from './components/Claim'
 import { useConnect } from './ConnectContext'
@@ -17,7 +17,7 @@ import { Thorchain } from './components/Thorchain'
 export const Connect = () => {
   const items = [
     'Learn About Arkeo',
-    'Arkeo Account',
+    'Solana/EVM Wallet',
     'Eth Account',
     'Thorchain Account',
     'Claim',
@@ -37,7 +37,7 @@ export const Connect = () => {
       case 1:
         return <Learn />
       case 2:
-        return <Cosmos />
+        return <SolanaEvmWallet />
       case 3:
         return <Eth />
       case 4:

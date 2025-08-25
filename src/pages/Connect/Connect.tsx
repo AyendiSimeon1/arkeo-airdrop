@@ -118,26 +118,26 @@ export const Connect = () => {
   }
   const totalClaimAmount = arkeoAmountClaim + thorAmountClaim + ethAmountClaim
   return (
-    <Panel width="800px">
-      <Flex flexDir="row" textAlign="left">
-        <Flex flexDir="column" p="32px" gap="24px">
+    <Panel width={{ base: '100%', md: '800px' }}>
+      <Flex flexDir={{ base: 'column', md: 'row' }} textAlign="left">
+        <Flex flexDir="column" p={{ base: 2, md: '32px' }} gap={{ base: 2, md: '24px' }} width={{ base: '100%', md: 'auto' }}>
           <Text fontWeight={900}>Claim Airdrop</Text>
-          <Flex height='340px' flexDir="column" gap="8px">
+          <Flex height={{ base: 'auto', md: '340px' }} flexDir="column" gap={{ base: 1, md: '8px' }}>
             {renderListItem()}
           </Flex>
-          <Box pt="64px" bottom="0">
-            <Text fontSize="14px" fontWeight={500} color="grey.50">
+          <Box pt={{ base: '24px', md: '64px' }} bottom="0">
+            <Text fontSize={{ base: '12px', md: '14px' }} fontWeight={500} color="grey.50">
               Available to Claim
             </Text>
             <Flex flexDir="row" alignItems="center">
-              <Image w="24px" h="24px" src={Symbol} />
-              <Text fontSize="24px" fontWeight="900" pl="5px">
+              <Image w={{ base: '18px', md: '24px' }} h={{ base: '18px', md: '24px' }} src={Symbol} />
+              <Text fontSize={{ base: '18px', md: '24px' }} fontWeight="900" pl="5px">
                 {toDecimal(totalClaimAmount)}
               </Text>
             </Flex>
           </Box>
         </Flex>
-        <Flex flexDir="column" flex="1 0 0" backgroundColor="grey.300" p="32px">
+        <Flex flexDir="column" flex="1 0 0" backgroundColor="grey.300" p={{ base: 2, md: '32px' }} width="100%">
           {displayStep()}
         </Flex>
       </Flex>

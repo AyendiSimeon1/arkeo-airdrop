@@ -22,20 +22,20 @@ export const Panel: React.FC<Props> = ({
     flex="1"
     flexDir="column"
     justifyContent="center"
-    width="650px"
-    px={{ base: 4, md: 0 }}
+    width={{ base: '100%', sm: '95%', md: '650px' }}
+    px={{ base: 1, sm: 2, md: 0 }}
     {...rest}
   >
     <Container
-      borderRadius="24px"
+      borderRadius={{ base: '12px', md: '24px' }}
       color="white"
       border="1px solid"
       borderColor="grey.200"
-      boxShadow="0px 0px 150px 0px rgba(0, 0, 0, 0.25)"
+      boxShadow="0px 0px 50px 0px rgba(0, 0, 0, 0.18)"
       backgroundColor="grey.300"
-      backdropFilter="blur(50px)"
+      backdropFilter="blur(30px)"
       maxW="auto"
-      p="0"
+      p={{ base: 2, md: 0 }}
       height="inherit"
       {...containerProps}
     >
